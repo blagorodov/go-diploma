@@ -1,4 +1,4 @@
-package auth
+package repositories
 
 import (
 	"diploma/internal/drivers"
@@ -8,17 +8,17 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-type Repository struct {
+type AuthRepository struct {
 	db drivers.Database
 }
 
-func NewRepository(db drivers.Database) Repository {
-	return Repository{
+func NewAuthRepository(db drivers.Database) AuthRepository {
+	return AuthRepository{
 		db: db,
 	}
 }
 
-func (r *Repository) Get(login string) (*models.User, error) {
+func (r *AuthRepository) Get(login string) (*models.User, error) {
 	var user models.User
 	result := r.db.DB.Where("Login = ?", login).First(&user)
 	if result.Error != nil {
@@ -31,7 +31,7 @@ func (r *Repository) Get(login string) (*models.User, error) {
 	return &user, result.Error
 }
 
-func (r *Repository) Register(user *models.User) error {
+func (r *AuthRepository) Register(user *models.User) error {
 	result := r.db.DB.Create(user)
 	if result.Error != nil {
 		// check for unique violation error

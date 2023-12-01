@@ -3,6 +3,7 @@ module diploma
 go 1.21
 
 require (
+	github.com/ShiraazMoollatjie/goluhn v0.0.0-20211017190329-0d86158c056a // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/aurowora/compress v0.0.0-20230724224640-6512772d482f // indirect
 	github.com/bytedance/sonic v1.10.2 // indirect

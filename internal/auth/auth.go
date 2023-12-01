@@ -46,7 +46,8 @@ func DecodeID(token string) (string, error) {
 	h := hmac.New(sha256.New, hashKey)
 	h.Write([]byte(id))
 	dst := h.Sum(nil)
-
+	fmt.Println(dst)
+	fmt.Println(key)
 	if !hmac.Equal(dst, key) {
 		return "", ErrWrongToken
 	}

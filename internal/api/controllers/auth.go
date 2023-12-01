@@ -1,7 +1,7 @@
-package auth
+package controllers
 
 import (
-	authservices "diploma/internal/api/services"
+	"diploma/internal/api/services"
 	"diploma/internal/auth"
 	"diploma/internal/logger"
 	"diploma/internal/models"
@@ -12,18 +12,18 @@ import (
 	"strconv"
 )
 
-type Controller struct {
-	service authservices.Service
+type AuthController struct {
+	service services.AuthService
 }
 
-func NewController(s authservices.Service) Controller {
-	return Controller{
+func NewAuthController(s services.AuthService) AuthController {
+	return AuthController{
 		service: s,
 	}
 }
 
-func (c Controller) Login(ctx *gin.Context) {
-	logger.Log("Controller::Login")
+func (c AuthController) Login(ctx *gin.Context) {
+	logger.Log("AuthController::Login")
 	var userRequest models.User
 
 	// Parse request
@@ -52,8 +52,8 @@ func (c Controller) Login(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, nil)
 }
 
-func (c Controller) Register(ctx *gin.Context) {
-	logger.Log("Controller::Register")
+func (c AuthController) Register(ctx *gin.Context) {
+	logger.Log("AuthController::Register")
 	var user models.User
 
 	// Parse request

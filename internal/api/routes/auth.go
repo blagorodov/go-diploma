@@ -1,16 +1,16 @@
-package auth
+package routes
 
 import (
-	auth "diploma/internal/api/controllers"
+	"diploma/internal/api/controllers"
 	"diploma/internal/drivers"
 )
 
 type AuthRoute struct {
-	Controller auth.Controller
+	Controller controllers.AuthController
 	Handler    drivers.GinRouter
 }
 
-func NewRoute(controller auth.Controller, handler drivers.GinRouter) AuthRoute {
+func NewAuthRoute(controller controllers.AuthController, handler drivers.GinRouter) AuthRoute {
 	return AuthRoute{
 		Controller: controller,
 		Handler:    handler,

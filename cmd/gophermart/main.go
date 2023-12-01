@@ -1,10 +1,10 @@
 package main
 
 import (
-	authcontrollers "diploma/internal/api/controllers"
-	authrepositories "diploma/internal/api/repositories"
-	authroutes "diploma/internal/api/routes"
-	authservices "diploma/internal/api/services"
+	"diploma/internal/api/controllers"
+	"diploma/internal/api/repositories"
+	"diploma/internal/api/routes"
+	"diploma/internal/api/services"
 	"diploma/internal/config"
 	"diploma/internal/drivers"
 	"diploma/internal/logger"
@@ -15,13 +15,20 @@ func main() {
 	logger.Init()
 	router := drivers.NewGinRouter()
 	db := drivers.NewDatabase()
-	authRepository := authrepositories.NewRepository(db)
-	authService := authservices.NewService(authRepository)
-	authController := authcontrollers.NewController(authService)
-	authRoute := authroutes.NewRoute(authController, router)
+
+	authRepository := repositories.NewAuthRepository(db)
+	authService := services.NewAuthService(authRepository)
+	authController := controllers.NewAuthController(authService)
+	authRoute := routes.NewAuthRoute(authController, router)
 	authRoute.Setup()
 
-	if err := db.DB.AutoMigrate(&models.User{}); err != nil {
+	ordersRepository := repositories.NewOrdersRepository(db)
+	ordersService := services.NewOrdersService(ordersRepository)
+	ordersController := controllers.NewOrdersController(ordersService)
+	ordersRoute := routes.NewOrdersRoute(ordersController, router)
+	ordersRoute.Setup()
+
+	if err := db.DB.AutoMigrate(&models.User{}, &models.Order{}, &models.Withdrawal{}); err != nil {
 		logger.Log("Error when automigrate")
 		logger.Log(err.Error())
 		return
