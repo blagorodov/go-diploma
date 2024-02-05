@@ -28,6 +28,12 @@ func main() {
 	ordersRoute := routes.NewOrdersRoute(ordersController, router)
 	ordersRoute.Setup()
 
+	balanceRepository := repositories.NewBalanceRepository(db)
+	balanceService := services.NewBalanceService(balanceRepository, ordersRepository)
+	balanceController := controllers.NewBalanceController(balanceService)
+	balanceRoute := routes.NewBalanceRoute(balanceController, router)
+	balanceRoute.Setup()
+
 	if err := db.DB.AutoMigrate(&models.User{}, &models.Order{}, &models.Withdrawal{}); err != nil {
 		logger.Log("Error when automigrate")
 		logger.Log(err.Error())

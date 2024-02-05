@@ -1,14 +1,9 @@
 package models
 
 import (
-	"errors"
-	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
-
-var ErrLoginUniqueViolation = errors.New("login should be unique")
-var ErrLoginOrPasswordNotFound = errors.New("login or password not found")
 
 type User struct {
 	ID        int       `gorm:"primary_key;auto_increment" json:"id"`
@@ -17,20 +12,6 @@ type User struct {
 	Balance   int       `gorm:"not null;default:0"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime"`
-}
-
-func (u *User) TableName() string {
-	return "users"
-}
-
-func (u *User) ResponseMap() gin.H {
-	resp := make(gin.H)
-	resp["id"] = u.ID
-	resp["login"] = u.Login
-	resp["password"] = u.Password
-	resp["created_at"] = u.CreatedAt
-	resp["updated_at"] = u.UpdatedAt
-	return resp
 }
 
 func (u *User) HashPassword() error {

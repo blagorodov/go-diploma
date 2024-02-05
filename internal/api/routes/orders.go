@@ -2,7 +2,6 @@ package routes
 
 import (
 	"diploma/internal/api/controllers"
-	"diploma/internal/auth"
 	"diploma/internal/drivers"
 )
 
@@ -19,6 +18,6 @@ func NewOrdersRoute(controller controllers.OrdersController, handler drivers.Gin
 }
 
 func (r OrdersRoute) Setup() {
-	r.Handler.Gin.POST("/api/user/orders", r.Controller.Add).Use(auth.WithToken())
-	r.Handler.Gin.GET("/api/user/orders", r.Controller.List).Use(auth.WithToken())
+	r.Handler.Gin.POST("/api/user/orders", r.Controller.Add)
+	r.Handler.Gin.GET("/api/user/orders", r.Controller.List)
 }
