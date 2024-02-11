@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"diploma/internal/api/clients"
 	"diploma/internal/api/controllers"
 	"diploma/internal/api/repositories"
 	"diploma/internal/api/routes"
@@ -9,6 +11,9 @@ import (
 	"diploma/internal/drivers"
 	"diploma/internal/logger"
 	"diploma/internal/models"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -22,8 +27,10 @@ func main() {
 	authRoute := routes.NewAuthRoute(authController, router)
 	authRoute.Setup()
 
+	accrualClient := clients.NewAccrualClient(config.Options.AccrualAddress)
+
 	ordersRepository := repositories.NewOrdersRepository(db)
-	ordersService := services.NewOrdersService(ordersRepository)
+	ordersService := services.NewOrdersService(ordersRepository, accrualClient)
 	ordersController := controllers.NewOrdersController(ordersService)
 	ordersRoute := routes.NewOrdersRoute(ordersController, router)
 	ordersRoute.Setup()
@@ -44,4 +51,15 @@ func main() {
 		logger.Log(err.Error())
 		return
 	}
+
+	mainCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	go func() error {
+		if err := ordersService.RunPollingStatuses(mainCtx); err != nil {
+			logger.Log("Failed polling statuses")
+			return err
+		}
+		return nil
+	}()
 }

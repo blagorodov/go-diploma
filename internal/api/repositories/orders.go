@@ -4,6 +4,7 @@ import (
 	"diploma/internal/drivers"
 	"diploma/internal/errs"
 	"diploma/internal/models"
+	"gorm.io/gorm"
 )
 
 type OrdersRepository struct {
@@ -34,10 +35,41 @@ func (r *OrdersRepository) Add(number string, userID string) error {
 	return result.Error
 }
 
-func (r *OrdersRepository) List(userID string) ([]*models.Order, error) {
+func (r *OrdersRepository) Update(order *models.Order) error {
+	result := r.db.DB.Save(order)
+	return result.Error
+}
+
+func (r *OrdersRepository) ListAll(userID string) ([]*models.Order, error) {
 	var orders []*models.Order
 	if err := r.db.DB.Where("user_id = ?", userID).Find(&orders).Error; err != nil {
 		return nil, err
 	}
 	return orders, nil
+}
+
+func (r *OrdersRepository) ListPending() ([]*models.Order, error) {
+	var orders []*models.Order
+	if err := r.db.DB.
+		Where("status in (?, ?)", models.NEW, models.PROCESSING).
+		Find(&orders).Error; err != nil {
+
+		return nil, err
+	}
+	return orders, nil
+}
+
+func (r *OrdersRepository) Charge(order *models.Order) error {
+	return r.db.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Save(&order).Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&models.User{}).
+			Where("id = ?", order.UserID).
+			Update("balance", gorm.Expr("balance - ?", order.Accrual)).Error; err != nil {
+
+			return err
+		}
+		return nil
+	})
 }

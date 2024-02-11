@@ -65,7 +65,7 @@ func (c OrdersController) Add(ctx *gin.Context) {
 }
 
 func (c OrdersController) List(ctx *gin.Context) {
-	logger.Log("OrdersController::List")
+	logger.Log("OrdersController::ListAll")
 	if _, err := auth.GetID(ctx); err != nil {
 		utils.ErrorJSON(ctx, http.StatusUnauthorized, nil)
 		return

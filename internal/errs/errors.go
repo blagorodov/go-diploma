@@ -10,3 +10,4 @@ var ErrOrderOtherUserDuplicate = errors.New("this order number is already added 
 var ErrOrderNotFound = errors.New("order not found")
 var ErrUserNotFound = errors.New("user not found")
 var ErrBalanceNotEnoughFunds = errors.New("not enough funds")
+var ErrNoAccrual = errors.New("accrual system is unavailable")
