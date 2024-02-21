@@ -62,6 +62,8 @@ func (c OrdersController) Add(ctx *gin.Context) {
 	if err != nil {
 		utils.ErrorJSON(ctx, http.StatusInternalServerError, nil)
 	}
+
+	ctx.Status(http.StatusAccepted)
 }
 
 func (c OrdersController) List(ctx *gin.Context) {
