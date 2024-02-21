@@ -24,8 +24,7 @@ func main() {
 	data2 := []byte(dataString2)
 	buf2 := bytes.NewBuffer(data2)
 	resp, err := http.Post(URLGoods, "application/json", buf2)
-	err = resp.Body.Close()
-	if err != nil {
+	if err := resp.Body.Close(); err != nil {
 		return
 	}
 	if err != nil {
@@ -47,8 +46,7 @@ func main() {
 
 		client := &http.Client{}
 		resp, err = client.Do(req)
-		err = resp.Body.Close()
-		if err != nil {
+		if err := resp.Body.Close(); err != nil {
 			return
 		}
 		if err != nil {
