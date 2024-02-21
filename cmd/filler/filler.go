@@ -23,7 +23,8 @@ func main() {
 	URLGoods := "http://localhost:10001/api/goods"
 	data2 := []byte(dataString2)
 	buf2 := bytes.NewBuffer(data2)
-	_, err := http.Post(URLGoods, "application/json", buf2)
+	resp, err := http.Post(URLGoods, "application/json", buf2)
+	defer resp.Body.Close()
 	if err != nil {
 		return
 	}
@@ -42,7 +43,8 @@ func main() {
 		req.Header.Set("Content-Type", "application/json")
 
 		client := &http.Client{}
-		_, err = client.Do(req)
+		resp, err = client.Do(req)
+		defer resp.Body.Close()
 		if err != nil {
 			fmt.Println(err.Error())
 			continue
