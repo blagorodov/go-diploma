@@ -46,11 +46,6 @@ func main() {
 		logger.Log(err.Error())
 		return
 	}
-	if err := router.Gin.Run(config.Options.ServerAddress); err != nil {
-		logger.Log("Error starting server")
-		logger.Log(err.Error())
-		return
-	}
 
 	mainCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -62,4 +57,10 @@ func main() {
 		}
 		return nil
 	}()
+
+	if err := router.Gin.Run(config.Options.ServerAddress); err != nil {
+		logger.Log("Error starting server")
+		logger.Log(err.Error())
+		return
+	}
 }

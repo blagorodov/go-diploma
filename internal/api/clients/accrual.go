@@ -34,7 +34,9 @@ func (client *AccrualClient) GetOrderInfo(ctx context.Context, orderNumber strin
 	response, err := client.client.R().
 		SetContext(ctx).
 		SetResult(order).
-		Get(fmt.Sprintf("/api/orders/%s", orderNumber))
+		Get(fmt.Sprintf("http://localhost:10003/api/orders/%s", orderNumber))
+
+	logger.Log(err)
 
 	if err != nil {
 		return nil, errs.ErrNoAccrual
