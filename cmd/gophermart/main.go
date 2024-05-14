@@ -21,6 +21,27 @@ func main() {
 	router := drivers.NewGinRouter()
 	db := drivers.NewDatabase()
 
+	ordersServices := initApp(db, router)
+
+	if err := db.DB.AutoMigrate(&models.User{}, &models.Order{}, &models.Withdrawal{}); err != nil {
+		logger.Log("Error when automigrate")
+		logger.Log(err.Error())
+		return
+	}
+
+	mainCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	runPolling(ordersServices, mainCtx)
+
+	if err := router.Gin.Run(config.Options.ServerAddress); err != nil {
+		logger.Log("Error starting server")
+		logger.Log(err.Error())
+		return
+	}
+}
+
+func initApp(db drivers.Database, router drivers.GinRouter) services.OrdersService {
 	authRepository := repositories.NewAuthRepository(db)
 	authService := services.NewAuthService(authRepository)
 	authController := controllers.NewAuthController(authService)
@@ -41,15 +62,10 @@ func main() {
 	balanceRoute := routes.NewBalanceRoute(balanceController, router)
 	balanceRoute.Setup()
 
-	if err := db.DB.AutoMigrate(&models.User{}, &models.Order{}, &models.Withdrawal{}); err != nil {
-		logger.Log("Error when automigrate")
-		logger.Log(err.Error())
-		return
-	}
+	return ordersService
+}
 
-	mainCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
-
+func runPolling(ordersService services.OrdersService, mainCtx context.Context) {
 	go func() error {
 		if err := ordersService.RunPollingStatuses(mainCtx); err != nil {
 			logger.Log("Failed polling statuses")
@@ -57,10 +73,4 @@ func main() {
 		}
 		return nil
 	}()
-
-	if err := router.Gin.Run(config.Options.ServerAddress); err != nil {
-		logger.Log("Error starting server")
-		logger.Log(err.Error())
-		return
-	}
 }
