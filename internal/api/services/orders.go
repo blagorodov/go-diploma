@@ -67,7 +67,7 @@ func (s *OrdersService) Poll(ctx context.Context, order *models.Order) (bool, er
 	}
 
 	order.Status = response.Status
-	order.Accrual = (int)(*response.Accrual * 100)
+	order.Accrual = (int)(response.Accrual * 100)
 
 	if err = s.ordersRepository.Charge(order); err != nil {
 		return false, err

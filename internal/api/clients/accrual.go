@@ -17,9 +17,9 @@ type AccrualClient struct {
 }
 
 type Order struct {
-	Order   string   `json:"order"`
-	Status  string   `json:"status"`
-	Accrual *float64 `json:"accrual"`
+	Order   string  `json:"order"`
+	Status  string  `json:"status"`
+	Accrual float64 `json:"accrual"`
 }
 
 func NewAccrualClient(url string) AccrualClient {
@@ -36,8 +36,6 @@ func (client *AccrualClient) GetOrderInfo(ctx context.Context, orderNumber strin
 		SetContext(ctx).
 		SetResult(order).
 		Get(fmt.Sprintf("http://localhost%s/api/orders/%s", config.Options.AccrualAddress, orderNumber))
-
-	logger.Log(err)
 
 	if err != nil {
 		return nil, errs.ErrNoAccrual

@@ -50,10 +50,7 @@ func main() {
 		logger.Log(err.Error())
 		return
 	}
-	select {
-	case <-ctx.Done():
-		logger.Log("Timeout exceeded, shutting down server...")
-	}
+	<-ctx.Done()
 	logger.Log("Server exiting")
 }
 
