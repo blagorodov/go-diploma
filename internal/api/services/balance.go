@@ -5,7 +5,7 @@ import (
 	"diploma/internal/auth"
 	"diploma/internal/errs"
 	"diploma/internal/models"
-	"errors"
+	"diploma/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -37,10 +37,15 @@ func (s *BalanceService) Get(ctx *gin.Context) (float64, float64, error) {
 func (s *BalanceService) Withdraw(ctx *gin.Context, orderNumber string, sum float64) error {
 	userID, _ := auth.GetID(ctx)
 	// check order exists
-	_, err := s.orderRepository.Get(orderNumber)
-	if errors.Is(err, errs.ErrOrderNotFound) {
-		return err
+	if !utils.ValidateLuhn(orderNumber) {
+		return errs.ErrOrderNotFound
 	}
+
+	//_, err := s.orderRepository.Get(orderNumber)
+	//if errors.Is(err, errs.ErrOrderNotFound) {
+	//	return err
+	//}
+
 	// check user balance
 	balance, _, err := s.Get(ctx)
 	if err != nil {
