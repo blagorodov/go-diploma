@@ -37,19 +37,13 @@ func (client *AccrualClient) GetOrderInfo(ctx context.Context, orderNumber strin
 		SetResult(order).
 		Get(fmt.Sprintf("%s/api/orders/%s", config.Options.AccrualAddress, orderNumber))
 
-	logger.Log("- error: ")
-	logger.Log(err)
-
 	if err != nil {
 		return nil, errs.ErrNoAccrual
 	}
 
-	logger.Log("- step2")
-
 	if err = client.isBlocked(response); err != nil {
 		return nil, err
 	}
-	logger.Log("- step3")
 
 	logger.Log(fmt.Sprintf("got from accrual [%s] order: %s, message: %s",
 		response.Status(),

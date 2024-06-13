@@ -40,12 +40,6 @@ func (s *BalanceService) Withdraw(ctx *gin.Context, orderNumber string, sum floa
 	if !utils.ValidateLuhn(orderNumber) {
 		return errs.ErrOrderNotFound
 	}
-
-	//_, err := s.orderRepository.Get(orderNumber)
-	//if errors.Is(err, errs.ErrOrderNotFound) {
-	//	return err
-	//}
-
 	// check user balance
 	balance, _, err := s.Get(ctx)
 	if err != nil {

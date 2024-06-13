@@ -81,7 +81,6 @@ func (s *OrdersService) RunPollingStatuses(ctx context.Context) error {
 	defer ticker.Stop()
 
 	for {
-		logger.Log("poll")
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -105,8 +104,6 @@ func (s *OrdersService) pollStatuses(ctx context.Context) error {
 	}
 
 	for _, order := range orders {
-		logger.Log(order)
-
 		updated, err := s.Poll(ctx, order)
 		if err != nil {
 			return err
