@@ -35,7 +35,7 @@ func (client *AccrualClient) GetOrderInfo(ctx context.Context, orderNumber strin
 	response, err := client.client.R().
 		SetContext(ctx).
 		SetResult(order).
-		Get(fmt.Sprintf("http://localhost%s/api/orders/%s", config.Options.AccrualAddress, orderNumber))
+		Get(fmt.Sprintf("%s/api/orders/%s", config.Options.AccrualAddress, orderNumber))
 
 	logger.Log("- error: ")
 	logger.Log(err)
