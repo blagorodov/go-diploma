@@ -89,7 +89,7 @@ func (c OrdersController) List(ctx *gin.Context) {
 			UploadedAt: order.UploadedAt,
 		}
 		if order.Status == models.PROCESSED {
-			item.Accrual = order.Accrual / 100
+			item.Accrual = float64(order.Accrual) / 100
 		}
 		response = append(response, item)
 	}
