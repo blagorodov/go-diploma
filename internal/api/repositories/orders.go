@@ -66,7 +66,7 @@ func (r *OrdersRepository) Charge(order *models.Order) error {
 		}
 		if err := tx.Model(&models.User{}).
 			Where("id = ?", order.UserID).
-			Update("balance", gorm.Expr("balance - ?", order.Accrual)).Error; err != nil {
+			Update("balance", gorm.Expr("balance + ?", order.Accrual)).Error; err != nil {
 
 			return err
 		}
