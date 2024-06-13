@@ -2,6 +2,7 @@ package clients
 
 import (
 	"context"
+	"diploma/internal/config"
 	"diploma/internal/errs"
 	"diploma/internal/logger"
 	"fmt"
@@ -34,7 +35,7 @@ func (client *AccrualClient) GetOrderInfo(ctx context.Context, orderNumber strin
 	response, err := client.client.R().
 		SetContext(ctx).
 		SetResult(order).
-		Get(fmt.Sprintf("http://localhost:10003/api/orders/%s", orderNumber))
+		Get(fmt.Sprintf("http://localhost%s/api/orders/%s", config.Options.AccrualAddress, orderNumber))
 
 	logger.Log(err)
 

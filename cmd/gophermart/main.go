@@ -11,9 +11,12 @@ import (
 	"diploma/internal/drivers"
 	"diploma/internal/logger"
 	"diploma/internal/models"
+	"errors"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func main() {
@@ -33,12 +36,25 @@ func main() {
 	defer stop()
 
 	runPolling(ordersServices, mainCtx)
+	srv := runServer(router)
 
-	if err := router.Gin.Run(config.Options.ServerAddress); err != nil {
-		logger.Log("Error starting server")
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	logger.Log("Shutting down server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		logger.Log("Server shutdown failure:")
 		logger.Log(err.Error())
 		return
 	}
+	select {
+	case <-ctx.Done():
+		logger.Log("Timeout exceeded, shutting down server...")
+	}
+	logger.Log("Server exiting")
 }
 
 func initApp(db drivers.Database, router drivers.GinRouter) services.OrdersService {
@@ -66,11 +82,25 @@ func initApp(db drivers.Database, router drivers.GinRouter) services.OrdersServi
 }
 
 func runPolling(ordersService services.OrdersService, mainCtx context.Context) {
-	go func() error {
+	go func() {
 		if err := ordersService.RunPollingStatuses(mainCtx); err != nil {
 			logger.Log("Failed polling statuses")
-			return err
 		}
-		return nil
 	}()
+}
+
+func runServer(router drivers.GinRouter) *http.Server {
+	srv := &http.Server{
+		Addr:    config.Options.ServerAddress,
+		Handler: router.Gin.Handler(),
+	}
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			logger.Log("Error starting server")
+			logger.Log(err.Error())
+		}
+	}()
+
+	return srv
 }
